@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des Avis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Analyse des Avis Clients</h1>
+        <p>Entrez votre avis :</p>
+        <form id="reviewForm">
+            <textarea id="reviewInput" placeholder="Tapez votre avis ici..."></textarea><br>
+            <button type="button" id="submitBtn">Analyser</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            const review = document.getElementById('reviewInput').value;
+
+            // Vérifier que le champ n'est pas vide
+            if (!review) {
+                alert('Veuillez entrer un avis.');
+                return;
+            }
+
+            // Envoyer l'avis au serveur
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ Review: review })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').textContent = `Erreur : ${data.error}`;
+                } else {
+                    document.getElementById('result').textContent = `Résultat : ${data.prediction_text}`;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                document.getElementById('result').textContent = 'Erreur lors de la communication avec le serveur.';
+            });
+        });
+    </script>
+</body>
+</html>
